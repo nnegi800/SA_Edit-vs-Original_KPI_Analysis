@@ -92,3 +92,84 @@ At the bottom of the dashboard:
 - All data stays in your browser (`localStorage`). Nothing is uploaded to any server.
 - Storage is limited by the browser's localStorage quota (~5MB). Delete older reports from the home screen if needed.
 - Translation uses Google's public endpoint and requires an internet connection for Step 2 only.
+
+---
+
+## Source File Structure
+
+The tool expects a raw export file (`.xlsx`) with the following structure.
+
+### Sheet1 — Main data
+
+Each row represents one AI-generated outreach message. Key columns:
+
+| Column | Description |
+|---|---|
+| `seller_id` | Unique identifier for the Sales Associate |
+| `unify_id` | Client/customer identifier |
+| `use_case` | One of three values: `ai360_action_plan_emotional_bonding`, `ai360_action_plan_task`, `ai360_action_plan_product_storytelling` |
+| `created` | Timestamp the AI message was generated |
+| `conversation_starter_subject` | Subject line of the AI message (Chinese) |
+| `description` | Internal description of the use case (Chinese) |
+| `conversation_starter_message` | The full AI-generated message text (Chinese) |
+| `copy_to_chat_history` | JSON field containing the SA's edit, if any (see below) |
+
+### `copy_to_chat_history` JSON structure
+
+```json
+{
+  "latest_version": "v1",
+  "v1": {
+    "is_change": true,
+    "send_time": "2024-11-15T10:32:00+08:00",
+    "send_content": "The message the SA actually sent (Chinese)"
+  }
+}
+```
+
+- `is_change: true` — the SA edited the AI message before sending
+- `is_change: false` — the SA sent the AI message without changes
+- `send_content` — the final message sent to the client
+- `send_time` — when the message was sent (timezone: +08:00)
+
+Only rows where `is_change: true` are included in the analysis.
+
+---
+
+## Python Pipeline (Local / Excel Output)
+
+For users who want to run the analysis locally and export results to Excel rather than using the browser tool.
+
+### Setup
+
+```bash
+pip install -r requirements.txt
+```
+
+### Scripts — run in this order
+
+| Step | Script | What it does |
+|---|---|---|
+| 1 | `translate_export.py` | Filters `is_change=true` rows, translates Chinese → English, exports `SA_edits_translated.xlsx` |
+| 2 | `enrich_diffs.py` | Adds character-level diff highlighting (red = removed, green = added) and a `change_summary` column to the translated file |
+| 3 | `rebuild_xlsx.py` | Rebuilds the file using `xlsxwriter` for full Excel compatibility (avoids XML corruption from openpyxl rich text) |
+| 4 | `add_kpi_panel.py` | Reads the translated file + original file, computes all KPIs, and outputs `KPI_Summary.xlsx` |
+
+### Adjusting thresholds
+
+All thresholds are defined at the top of `add_kpi_panel.py`:
+
+- **Length change threshold** — search for `25` in the `classify()` function (`>= 25` = Expanded, `<= -25` = Shortened)
+- **SA distribution buckets** — search for `bucket_0`, `bucket_1_20` etc. in `_sa_distribution_kpis()`
+- **Content type keywords** — `CN_GREET`, `CN_CTA`, `CN_PRODUCT`, `CN_SCARCITY`, `CN_CARE`, `CN_SEASON` lists in `classify()`
+- **Location zones** — `0.3` and `0.7` thresholds in `classify()` (30% / 70% of character length)
+
+### Streamlit UI (alternative to the HTML tool)
+
+An alternative browser interface built with Streamlit is also included:
+
+```bash
+streamlit run app.py
+```
+
+This runs the same pipeline interactively in the browser with a Python backend, as an alternative to the standalone `index.html` tool.

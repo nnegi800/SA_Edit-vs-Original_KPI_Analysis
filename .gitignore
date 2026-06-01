@@ -1,0 +1,17 @@
+# Data files — not committed (may contain sensitive customer data)
+*.xlsx
+*.xls
+*.csv
+*.bak
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+pipeline/__pycache__/
+
+# macOS
+.DS_Store
+
+# Temp Excel lock files
+~$*
