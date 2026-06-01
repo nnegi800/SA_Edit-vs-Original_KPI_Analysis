@@ -1,0 +1,1088 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI360 SA Edits KPI</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --red:      #8B1A2B;
+  --red-dark: #6D1220;
+  --gold:     #B8964A;
+  --gold-lt:  #F2E8D5;
+  --cream:    #F6F6F6;
+  --cream-dk: #EEEEEE;
+  --warm-wht: #FAFAFA;
+  --border:   #E2D5C3;
+  --border-lt:#EDE5D8;
+  --text:     #1A0A08;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'Jost', -apple-system, BlinkMacSystemFont, sans-serif;
+  background: var(--cream); color: var(--text); font-weight: 300;
+}
+
+.page { display: none; min-height: 100vh; flex-direction: column; }
+.page.active { display: flex; }
+
+/* ── shared header ── */
+.top-bar {
+  background: var(--red); color: #fff;
+  padding: 0 40px; height: 58px;
+  display: flex; align-items: center; justify-content: space-between; flex-shrink: 0;
+  border-bottom: 1px solid var(--red-dark);
+}
+.top-bar h1 {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-size: 1.25rem; font-weight: 400; letter-spacing: .12em; text-transform: uppercase;
+  cursor: pointer;
+}
+.top-bar h1:hover { opacity: .8; }
+.top-bar-actions { display: flex; gap: 10px; }
+.ghost-btn {
+  background: transparent; color: rgba(255,255,255,.85);
+  border: 1px solid rgba(255,255,255,.35);
+  border-radius: 2px; padding: 6px 16px; cursor: pointer;
+  font-family: 'Jost', sans-serif; font-size: 0.78rem; font-weight: 400;
+  letter-spacing: .06em; transition: background .2s, color .2s;
+}
+.ghost-btn:hover { background: rgba(255,255,255,.12); color: #fff; }
+
+/* ══════════════ HOME PAGE ══════════════ */
+#page-home .body { flex: 1; padding: 40px 48px; }
+.home-intro { display: flex; align-items: center; justify-content: space-between; margin-bottom: 32px; }
+.home-intro h2 {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-size: 1.5rem; font-weight: 300; color: var(--text); letter-spacing: .04em;
+}
+.btn-primary {
+  background: var(--red); color: #fff; border: none; border-radius: 2px;
+  padding: 11px 26px; font-family: 'Jost', sans-serif;
+  font-size: 0.8rem; font-weight: 500; letter-spacing: .08em; text-transform: uppercase;
+  cursor: pointer; transition: background .2s;
+}
+.btn-primary:hover { background: var(--red-dark); }
+.btn-primary:disabled { background: #ccc; cursor: not-allowed; }
+
+/* empty state */
+.empty-state { text-align: center; padding: 90px 40px; color: #bbb; }
+.empty-state svg { width: 52px; height: 52px; margin-bottom: 18px; color: #D4C0A8; }
+.empty-state h3 { font-family: 'Cormorant Garamond', serif; font-size: 1.2rem; font-weight: 300; color: #999; margin-bottom: 8px; }
+.empty-state p  { font-size: 0.85rem; color: #bbb; }
+
+/* month cards */
+.month-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 20px; }
+.month-card {
+  background: var(--warm-wht); padding: 26px 26px 22px;
+  border: 1px solid var(--border); cursor: pointer; position: relative;
+  transition: border-color .2s, box-shadow .2s;
+}
+.month-card:hover { border-color: var(--gold); box-shadow: 0 4px 24px rgba(139,26,43,.08); }
+.month-card::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0;
+  height: 3px; background: var(--red); opacity: 0; transition: opacity .2s;
+}
+.month-card:hover::before { opacity: 1; }
+.month-card .mc-month {
+  font-family: 'Cormorant Garamond', serif; font-size: 1.15rem; font-weight: 400;
+  color: var(--text); margin-bottom: 14px; letter-spacing: .04em;
+}
+.month-card .mc-rate  { font-size: 2.2rem; font-weight: 600; color: var(--red); line-height: 1; }
+.month-card .mc-rate-label {
+  font-size: 0.68rem; text-transform: uppercase; letter-spacing: .1em;
+  color: #aaa; margin-bottom: 12px; margin-top: 2px;
+}
+.month-card .mc-stats { font-size: 0.8rem; color: #777; margin-bottom: 10px; font-weight: 300; }
+.month-card .mc-date  { font-size: 0.73rem; color: #bbb; font-weight: 300; }
+.month-card .mc-delete {
+  position: absolute; top: 14px; right: 14px; background: none; border: none;
+  cursor: pointer; color: #d4c0a8; font-size: 0.9rem; padding: 4px; transition: color .15s;
+}
+.month-card .mc-delete:hover { color: #c0392b; }
+
+/* ══════════════ UPLOAD PAGE ══════════════ */
+#page-upload { align-items: center; justify-content: center; background: var(--cream); }
+.upload-card {
+  background: var(--warm-wht); padding: 48px 56px;
+  border: 1px solid var(--border); max-width: 520px; width: 90%;
+  box-shadow: 0 8px 40px rgba(139,26,43,.06);
+}
+.upload-card h2 {
+  font-family: 'Cormorant Garamond', serif; font-size: 1.6rem; font-weight: 300;
+  color: var(--text); margin-bottom: 6px; letter-spacing: .04em;
+}
+.upload-card .sub { color: #999; font-size: 0.85rem; margin-bottom: 32px; font-weight: 300; line-height: 1.6; }
+
+.drop-zone {
+  border: 1.5px dashed var(--border); padding: 32px 20px;
+  cursor: pointer; transition: border-color .2s, background .2s;
+  margin-bottom: 22px; text-align: center; background: var(--cream);
+}
+.drop-zone:hover, .drop-zone.dragover { border-color: var(--red); background: var(--gold-lt); }
+.drop-zone svg { width: 34px; height: 34px; color: #C4A882; margin-bottom: 10px; }
+.drop-zone p { color: #999; font-size: 0.85rem; font-weight: 300; }
+.drop-zone .filename { color: var(--red); font-weight: 500; margin-top: 6px; font-size: 0.88rem; }
+#file-input { display: none; }
+
+.month-row { display: flex; gap: 10px; margin-bottom: 20px; }
+.month-row select {
+  flex: 1; padding: 10px 12px; border: 1px solid var(--border);
+  font-family: 'Jost', sans-serif; font-size: 0.88rem; color: var(--text);
+  background: var(--warm-wht); outline: none; transition: border-color .2s; border-radius: 0;
+  -webkit-appearance: none; appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23999'/%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: right 12px center; padding-right: 28px;
+}
+.month-row select:focus { border-color: var(--red); }
+.field-label { font-size: 0.72rem; font-weight: 500; letter-spacing: .08em; text-transform: uppercase; color: #888; margin-bottom: 8px; }
+
+.overwrite-warn {
+  background: #fff8e1; border: 1px solid #ffe082; padding: 9px 13px;
+  font-size: 0.82rem; color: #7a5c00; margin-bottom: 16px; display: none;
+}
+.upload-actions { display: flex; gap: 10px; }
+.upload-actions .btn-primary { flex: 1; padding: 13px; }
+.back-link {
+  background: none; border: 1px solid var(--border); color: #888;
+  padding: 13px 20px; font-family: 'Jost', sans-serif; font-size: 0.82rem;
+  letter-spacing: .04em; cursor: pointer; transition: border-color .2s, color .2s; border-radius: 0;
+}
+.back-link:hover { border-color: var(--red); color: var(--red); }
+
+/* ══════════════ PROCESSING PAGE ══════════════ */
+#page-processing { align-items: center; justify-content: center; background: var(--cream); }
+.processing-card {
+  background: var(--warm-wht); padding: 48px 56px;
+  border: 1px solid var(--border); max-width: 560px; width: 90%;
+  box-shadow: 0 8px 40px rgba(139,26,43,.06);
+}
+.processing-card h2 {
+  font-family: 'Cormorant Garamond', serif; font-size: 1.6rem; font-weight: 300;
+  color: var(--text); margin-bottom: 6px; letter-spacing: .04em;
+}
+.processing-card .month-tag {
+  display: inline-block; background: var(--gold-lt); color: var(--red);
+  padding: 3px 14px; font-size: 0.75rem; font-weight: 500;
+  letter-spacing: .06em; text-transform: uppercase; margin-bottom: 28px;
+}
+.step { margin-bottom: 22px; }
+.step-label { font-size: 0.82rem; font-weight: 500; color: #555; margin-bottom: 6px; display: flex; justify-content: space-between; letter-spacing: .02em; }
+.step-status { font-weight: 300; color: #bbb; }
+.step-status.active { color: var(--red); }
+.step-status.done   { color: #4a7c59; }
+.progress-track { background: var(--cream-dk); height: 3px; overflow: hidden; }
+.progress-fill  { background: var(--red); height: 3px; width: 0%; transition: width .35s ease; }
+.progress-fill.done { background: #4a7c59; width: 100% !important; }
+.step-detail { font-size: 0.76rem; color: #aaa; margin-top: 5px; min-height: 16px; font-weight: 300; }
+.discovery-banner {
+  background: var(--gold-lt); border: 1px solid var(--gold);
+  padding: 14px 18px; margin: 14px 0; border-left: 3px solid var(--gold);
+}
+.disc-main { font-size: 0.92rem; font-weight: 500; color: var(--text); }
+.disc-num  { color: var(--red); font-weight: 600; }
+.disc-sub  { font-size: 0.76rem; color: #888; margin-top: 4px; font-weight: 300; }
+
+/* ══════════════ DASHBOARD PAGE ══════════════ */
+#page-dashboard { flex-direction: column; }
+.dash-header {
+  background: var(--red); color: #fff; padding: 0 40px; height: 58px;
+  display: flex; align-items: center; justify-content: space-between; flex-shrink: 0;
+}
+.dash-header-left { display: flex; align-items: center; gap: 16px; }
+.dash-header h1 {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.2rem; font-weight: 400; letter-spacing: .12em; text-transform: uppercase;
+  cursor: pointer;
+}
+.dash-header h1:hover { opacity: .8; }
+.dash-month-tag {
+  background: rgba(255,255,255,.18); color: rgba(255,255,255,.9);
+  padding: 3px 12px; font-size: 0.72rem; font-weight: 500; letter-spacing: .06em; text-transform: uppercase;
+}
+
+.banner { background: var(--warm-wht); border-bottom: 1px solid var(--border); display: flex; }
+.banner-stat { flex: 1; padding: 22px 24px; text-align: center; border-right: 1px solid var(--border); }
+.banner-stat:last-child { border-right: none; }
+.banner-stat .bval { font-size: 1.9rem; font-weight: 600; color: var(--red); line-height: 1; }
+.banner-stat .blbl { font-size: 0.68rem; color: #aaa; margin-top: 5px; text-transform: uppercase; letter-spacing: .1em; font-weight: 400; }
+
+.dash-body { display: flex; flex: 1; min-height: 0; overflow: hidden; }
+.tab-sidebar { width: 210px; background: var(--warm-wht); border-right: 1px solid var(--border); padding: 24px 0; flex-shrink: 0; overflow-y: auto; }
+.tab-sidebar-label {
+  font-size: 0.65rem; font-weight: 500; letter-spacing: .12em; text-transform: uppercase;
+  color: #bbb; padding: 0 22px; margin-bottom: 10px;
+}
+.tab-btn {
+  display: block; width: 100%; text-align: left; padding: 9px 22px;
+  border: none; background: none; cursor: pointer;
+  font-family: 'Jost', sans-serif; font-size: 0.83rem; font-weight: 300;
+  color: #666; border-left: 2px solid transparent; transition: all .15s;
+}
+.tab-btn:hover { background: var(--cream); color: var(--text); }
+.tab-btn.active { color: var(--red); font-weight: 500; border-left-color: var(--red); background: var(--gold-lt); }
+
+.kpi-panel { flex: 1; overflow-y: auto; padding: 28px 38px; background: var(--cream); }
+
+.section-hdr {
+  display: flex; align-items: center; gap: 12px;
+  font-size: 0.68rem; font-weight: 500; letter-spacing: .12em; text-transform: uppercase;
+  color: var(--red); margin: 26px 0 10px;
+}
+.section-hdr::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+.section-hdr:first-child { margin-top: 0; }
+
+.kpi-row { display: grid; grid-template-columns: 1fr auto; align-items: start; gap: 10px; padding: 10px 0; border-bottom: 1px solid var(--border-lt); }
+.kpi-row:last-child { border-bottom: none; }
+.kpi-label { font-size: 0.83rem; color: #555; padding-top: 2px; font-weight: 300; }
+.kpi-right { display: flex; align-items: center; gap: 8px; }
+.kpi-value { font-size: 0.9rem; font-weight: 600; color: var(--text); white-space: nowrap; min-width: 88px; text-align: right; }
+.proof-btn {
+  background: transparent; color: var(--gold); border: 1px solid var(--gold);
+  padding: 3px 9px; font-family: 'Jost', sans-serif; font-size: 0.72rem; font-weight: 500;
+  letter-spacing: .04em; cursor: pointer; white-space: nowrap; transition: background .15s, color .15s;
+  border-radius: 0;
+}
+.proof-btn:hover { background: var(--gold); color: #fff; }
+.no-ev { font-size: 0.72rem; color: #ddd; min-width: 60px; text-align: right; }
+
+/* evidence drawer */
+.ev-drawer { display: none; grid-column: 1 / -1; background: var(--warm-wht); border: 1px solid var(--border); padding: 14px 16px; margin-top: 6px; }
+.ev-drawer.open { display: block; }
+.ev-drawer h4 { font-size: 0.72rem; font-weight: 500; letter-spacing: .06em; text-transform: uppercase; color: var(--red); margin-bottom: 10px; }
+.ev-wrap { overflow-x: auto; max-height: 300px; overflow-y: auto; }
+.ev-table { width: 100%; border-collapse: collapse; font-size: 0.78rem; }
+.ev-table th { background: var(--red); color: #fff; padding: 7px 10px; text-align: left; position: sticky; top: 0; white-space: nowrap; font-weight: 400; letter-spacing: .04em; font-size: 0.72rem; }
+.ev-table td { padding: 7px 10px; border-bottom: 1px solid var(--border-lt); vertical-align: top; max-width: 260px; line-height: 1.5; font-weight: 300; }
+.ev-table tr:nth-child(even) td { background: var(--cream); }
+.diff-del { color: #cc0000; }
+.diff-ins { color: #2a7a3b; }
+
+/* download bar */
+.download-bar {
+  background: var(--warm-wht); border-top: 1px solid var(--border);
+  padding: 14px 38px; display: flex; gap: 12px; align-items: center; flex-shrink: 0;
+}
+.download-bar span { font-size: 0.75rem; color: #aaa; letter-spacing: .04em; font-weight: 300; }
+.dl-btn {
+  background: var(--red); color: #fff; border: none;
+  padding: 9px 18px; font-family: 'Jost', sans-serif;
+  font-size: 0.78rem; font-weight: 500; letter-spacing: .06em; text-transform: uppercase;
+  cursor: pointer; transition: background .2s; border-radius: 0;
+}
+.dl-btn:hover { background: var(--red-dark); }
+.dl-btn.outline {
+  background: transparent; color: var(--red);
+  border: 1px solid var(--red);
+}
+.dl-btn.outline:hover { background: var(--red); color: #fff; }
+</style>
+</head>
+<body>
+
+<!-- ══════════════ HOME PAGE ══════════════ -->
+<div id="page-home" class="page active">
+  <div class="top-bar">
+    <h1 onclick="showPage('page-home')">AI360 SA Edits KPI</h1>
+    <button class="btn-primary" onclick="goUpload()">+ New Analysis</button>
+  </div>
+  <div class="body">
+    <div class="home-intro">
+      <h2>Monthly Reports</h2>
+      <span id="home-count" style="font-size:.83rem;color:#999"></span>
+    </div>
+    <div id="month-grid"></div>
+  </div>
+</div>
+
+<!-- ══════════════ UPLOAD PAGE ══════════════ -->
+<div id="page-upload" class="page" style="justify-content:center;align-items:center;">
+  <div class="upload-card">
+    <h2>New Analysis</h2>
+    <p class="sub">Upload the raw AI message export and select the month this data belongs to.</p>
+
+    <div class="drop-zone" id="drop-zone" onclick="document.getElementById('file-input').click()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M12 4v12M8 8l4-4 4 4"/></svg>
+      <p>Drop your xlsx file here, or click to browse</p>
+      <div class="filename" id="chosen-file"></div>
+    </div>
+    <input type="file" id="file-input" accept=".xlsx">
+
+    <div class="field-label">Which month is this data for?</div>
+    <div class="month-row">
+      <select id="sel-month"></select>
+      <select id="sel-year"></select>
+    </div>
+
+    <div class="overwrite-warn" id="overwrite-warn"></div>
+
+    <div class="upload-actions">
+      <button class="back-link" onclick="showPage('page-home')">← Back</button>
+      <button class="btn-primary" id="run-btn" disabled onclick="startPipeline()">Run Analysis</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════ PROCESSING PAGE ══════════════ -->
+<div id="page-processing" class="page" style="justify-content:center;align-items:center;">
+  <div class="processing-card">
+    <h2>Running Analysis</h2>
+    <div class="month-tag" id="proc-month-tag"></div>
+    <div class="step">
+      <div class="step-label"><span>Step 1 — Filter Rows</span><span class="step-status" id="s1-status">Waiting…</span></div>
+      <div class="progress-track"><div class="progress-fill" id="s1-bar"></div></div>
+      <div class="step-detail" id="s1-detail"></div>
+    </div>
+    <div class="discovery-banner" id="discovery-banner" style="display:none">
+      <div class="disc-main">Found <span id="disc-edited" class="disc-num">—</span> edited rows out of <span id="disc-total" class="disc-num">—</span> total</div>
+      <div class="disc-sub" id="disc-sub"></div>
+    </div>
+    <div class="step">
+      <div class="step-label"><span>Step 2 — Translate</span><span class="step-status" id="s2-status">Waiting…</span></div>
+      <div class="progress-track"><div class="progress-fill" id="s2-bar"></div></div>
+      <div class="step-detail" id="s2-detail"></div>
+    </div>
+    <div class="step">
+      <div class="step-label"><span>Step 3 — Diffs &amp; Summaries</span><span class="step-status" id="s3-status">Waiting…</span></div>
+      <div class="progress-track"><div class="progress-fill" id="s3-bar"></div></div>
+      <div class="step-detail" id="s3-detail"></div>
+    </div>
+    <div class="step">
+      <div class="step-label"><span>Step 4 — Compute KPIs</span><span class="step-status" id="s4-status">Waiting…</span></div>
+      <div class="progress-track"><div class="progress-fill" id="s4-bar"></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════ DASHBOARD PAGE ══════════════ -->
+<div id="page-dashboard" class="page">
+  <div class="dash-header">
+    <div class="dash-header-left">
+      <h1 onclick="showPage('page-home')">AI360 SA Edits KPI</h1>
+      <div class="dash-month-tag" id="dash-month-tag"></div>
+    </div>
+    <div class="top-bar-actions">
+      <button class="ghost-btn" onclick="showPage('page-home')">← All Reports</button>
+    </div>
+  </div>
+  <div class="banner" id="banner"></div>
+  <div class="dash-body">
+    <div class="tab-sidebar" id="tab-sidebar"></div>
+    <div class="kpi-panel" id="kpi-panel"></div>
+  </div>
+  <div class="download-bar">
+    <span>Download:</span>
+    <button class="dl-btn outline" onclick="downloadTranslated()">SA_edits_translated.xlsx</button>
+    <button class="dl-btn" onclick="downloadColoured()">SA_edits_coloured.xlsx</button>
+    <button class="dl-btn outline" onclick="downloadKPI()">KPI_Summary.xlsx</button>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script>
+'use strict';
+
+// ══════════════════════════════════════════════════════════════════════
+// STORAGE
+// ══════════════════════════════════════════════════════════════════════
+const STORE_INDEX = 'sa_analysis_index';   // array of { month, processedAt, editRate, totalGenerated, totalEdited }
+const STORE_DATA  = key => `sa_data_${key}`;
+
+function storageIndex() {
+  try { return JSON.parse(localStorage.getItem(STORE_INDEX) || '[]'); } catch { return []; }
+}
+
+function saveMonth(monthKey, meta, kpiResults, dfEdited) {
+  // strip computed diff HTML before storing (recomputed on load)
+  const lean = dfEdited.map(r => {
+    const { ai_diff_html, sent_diff_html, _m, ...rest } = r;
+    return rest;
+  });
+  const payload = JSON.stringify({ month: monthKey, processedAt: new Date().toISOString(), kpiResults, dfEdited: lean });
+  try {
+    localStorage.setItem(STORE_DATA(monthKey), payload);
+    const idx = storageIndex().filter(m => m.month !== monthKey);
+    idx.unshift({ month: monthKey, processedAt: new Date().toISOString(), ...meta });
+    localStorage.setItem(STORE_INDEX, JSON.stringify(idx));
+    return true;
+  } catch (e) {
+    alert('Storage full — please delete an older month before saving. (localStorage limit reached)');
+    return false;
+  }
+}
+
+function loadMonthData(monthKey) {
+  try {
+    const raw = localStorage.getItem(STORE_DATA(monthKey));
+    if (!raw) return null;
+    const data = JSON.parse(raw);
+    // recompute diff HTML from Chinese originals + classification flags
+    data.dfEdited = data.dfEdited.map(r => {
+      r.ai_diff_html   = diffToHtml(charDiff(r.ai_message_original || '', r.sent_message_original || '').segsA, 'ai');
+      r.sent_diff_html = diffToHtml(charDiff(r.ai_message_original || '', r.sent_message_original || '').segsB, 'sent');
+      r._m = classifyRow(r);
+      return r;
+    });
+    return data;
+  } catch { return null; }
+}
+
+function deleteMonth(monthKey) {
+  localStorage.removeItem(STORE_DATA(monthKey));
+  const idx = storageIndex().filter(m => m.month !== monthKey);
+  localStorage.setItem(STORE_INDEX, JSON.stringify(idx));
+}
+
+// ══════════════════════════════════════════════════════════════════════
+// STATE
+// ══════════════════════════════════════════════════════════════════════
+let G = { rawFile: null, dfEdited: [], dfFull: [], kpiResults: null, activeTab: 'Overall', activeMonth: null };
+
+// ══════════════════════════════════════════════════════════════════════
+// PAGE ROUTING
+// ══════════════════════════════════════════════════════════════════════
+function showPage(id) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  if (id === 'page-home') renderHomepage();
+}
+
+// ══════════════════════════════════════════════════════════════════════
+// HOME PAGE
+// ══════════════════════════════════════════════════════════════════════
+function renderHomepage() {
+  const idx   = storageIndex();
+  const grid  = document.getElementById('month-grid');
+  const count = document.getElementById('home-count');
+
+  count.textContent = idx.length ? `${idx.length} report${idx.length > 1 ? 's' : ''} stored` : '';
+
+  if (!idx.length) {
+    grid.innerHTML = `
+      <div class="empty-state">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2">
+          <path d="M9 17H7a4 4 0 01-4-4V7a4 4 0 014-4h10a4 4 0 014 4v6a4 4 0 01-4 4h-2"/>
+          <path d="M12 17v4M9 21h6"/>
+        </svg>
+        <h3>No reports yet</h3>
+        <p>Click <strong>+ New Analysis</strong> to run your first month.</p>
+      </div>`;
+    return;
+  }
+
+  grid.innerHTML = idx.map(m => {
+    const rate  = m.editRate || '—';
+    const date  = m.processedAt ? new Date(m.processedAt).toLocaleDateString('en-GB', { day:'numeric', month:'short', year:'numeric' }) : '';
+    const total = m.totalGenerated ? m.totalGenerated.toLocaleString() : '—';
+    const edited= m.totalEdited   ? m.totalEdited.toLocaleString()   : '—';
+    return `
+      <div class="month-card" onclick="openMonth('${m.month}')">
+        <button class="mc-delete" onclick="event.stopPropagation(); confirmDelete('${m.month}')" title="Delete">✕</button>
+        <div class="mc-month">${m.month}</div>
+        <div class="mc-rate">${rate.split('%')[0]}%</div>
+        <div class="mc-rate-label">Edit Rate</div>
+        <div class="mc-stats">${total} generated · ${edited} edited</div>
+        <div class="mc-date">Analysed ${date}</div>
+      </div>`;
+  }).join('');
+}
+
+function openMonth(monthKey) {
+  const data = loadMonthData(monthKey);
+  if (!data) { alert('Could not load data for ' + monthKey); return; }
+  G.dfEdited    = data.dfEdited;
+  G.kpiResults  = data.kpiResults;
+  G.activeMonth = monthKey;
+  G.activeTab   = 'Overall';
+  renderDashboard(monthKey);
+  showPage('page-dashboard');
+}
+
+function confirmDelete(monthKey) {
+  if (confirm(`Delete the report for ${monthKey}? This cannot be undone.`)) {
+    deleteMonth(monthKey);
+    renderHomepage();
+  }
+}
+
+// ══════════════════════════════════════════════════════════════════════
+// UPLOAD PAGE
+// ══════════════════════════════════════════════════════════════════════
+function goUpload() {
+  // populate month/year selectors
+  const MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+  const selM = document.getElementById('sel-month');
+  const selY = document.getElementById('sel-year');
+  selM.innerHTML = MONTHS.map((m,i) => `<option value="${i}">${m}</option>`).join('');
+  const now = new Date();
+  selM.value = now.getMonth();
+  selY.innerHTML = '';
+  for (let y = now.getFullYear() - 2; y <= now.getFullYear() + 1; y++) {
+    selY.innerHTML += `<option value="${y}" ${y === now.getFullYear() ? 'selected' : ''}>${y}</option>`;
+  }
+  selM.addEventListener('change', checkOverwrite);
+  selY.addEventListener('change', checkOverwrite);
+  checkOverwrite();
+  showPage('page-upload');
+}
+
+function selectedMonthKey() {
+  const MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+  return MONTHS[+document.getElementById('sel-month').value] + ' ' + document.getElementById('sel-year').value;
+}
+
+function checkOverwrite() {
+  const key  = selectedMonthKey();
+  const warn = document.getElementById('overwrite-warn');
+  const exists = storageIndex().some(m => m.month === key);
+  warn.style.display = exists ? 'block' : 'none';
+  warn.textContent   = exists ? `⚠ A report for ${key} already exists — running analysis will overwrite it.` : '';
+}
+
+// file drag & drop
+const dropZone  = document.getElementById('drop-zone');
+const fileInput = document.getElementById('file-input');
+dropZone.addEventListener('dragover',  e => { e.preventDefault(); dropZone.classList.add('dragover'); });
+dropZone.addEventListener('dragleave', ()  => dropZone.classList.remove('dragover'));
+dropZone.addEventListener('drop', e => {
+  e.preventDefault(); dropZone.classList.remove('dragover');
+  const f = e.dataTransfer.files[0]; if (f) setFile(f);
+});
+fileInput.addEventListener('change', e => { if (e.target.files[0]) setFile(e.target.files[0]); });
+
+function setFile(f) {
+  G.rawFile = f;
+  document.getElementById('chosen-file').textContent = f.name;
+  document.getElementById('run-btn').disabled = false;
+}
+
+// ══════════════════════════════════════════════════════════════════════
+// PIPELINE
+// ══════════════════════════════════════════════════════════════════════
+async function startPipeline() {
+  G.activeMonth = selectedMonthKey();
+  document.getElementById('proc-month-tag').textContent = G.activeMonth;
+  document.getElementById('discovery-banner').style.display = 'none';
+  showPage('page-processing');
+  await sleep(60);
+  try {
+    await runStep1();
+    await runStep2();
+    await runStep3();
+    await runStep4();
+    // save to storage
+    const ov   = G.kpiResults.overall;
+    const rate = (ov.edit_rate || '').split('  ')[0];
+    saveMonth(G.activeMonth,
+      { editRate: rate, totalGenerated: ov.total_generated, totalEdited: ov.total_edited },
+      G.kpiResults,
+      G.dfEdited
+    );
+    G.activeTab = 'Overall';
+    renderDashboard(G.activeMonth);
+    showPage('page-dashboard');
+  } catch(err) {
+    alert('Error: ' + err.message);
+    console.error(err);
+    showPage('page-upload');
+  }
+}
+
+// ── Step 1: parse + filter ──
+async function runStep1() {
+  setStep(1,'active','Reading file…');
+  const buf = await G.rawFile.arrayBuffer();
+  const wb  = XLSX.read(buf, { type:'array', cellDates:true });
+  const ws  = wb.Sheets['Sheet1'] || wb.Sheets[wb.SheetNames[0]];
+  const rows = XLSX.utils.sheet_to_json(ws, { defval:'' });
+
+  G.dfFull = rows.map(r => ({ use_case: r.use_case||'', seller_id: r.seller_id||'', copy_to_chat_history: r.copy_to_chat_history||'' }));
+
+  const editedRaw = [];
+  for (const r of rows) {
+    const cth = r.copy_to_chat_history; if (!cth) continue;
+    try {
+      const d = JSON.parse(cth), lv = d[d.latest_version||'v1']||{};
+      if (lv.is_change === true) editedRaw.push({ row:r, data:d, lv });
+    } catch {}
+  }
+
+  setProg(1,1); setStep(1,'done',`${editedRaw.length} edited rows identified`);
+  setDetail(1, `Scanned ${rows.length.toLocaleString()} total rows`);
+
+  // show discovery banner
+  const pct = rows.length ? Math.round(editedRaw.length / rows.length * 100) : 0;
+  document.getElementById('disc-edited').textContent = editedRaw.length.toLocaleString();
+  document.getElementById('disc-total').textContent  = rows.length.toLocaleString();
+  document.getElementById('disc-sub').textContent    = `${pct}% of AI-generated messages were edited by SAs`;
+  document.getElementById('discovery-banner').style.display = 'block';
+  await sleep(1400);
+
+  G._editedRaw = editedRaw;
+}
+
+// ── Step 2: translate ──
+async function runStep2() {
+  const editedRaw = G._editedRaw, total = editedRaw.length;
+  setStep(2,'active',`Starting translation…`);
+  G.dfEdited = [];
+  for (let i = 0; i < editedRaw.length; i++) {
+    const { row:r, data, lv } = editedRaw[i];
+    setProg(2, i/total); setDetail(2, `${i+1} / ${total} rows translated`);
+    const subO = r.conversation_starter_subject||'', descO = r.description||'',
+          aiO  = r.conversation_starter_message||'', sentO = lv.send_content||'';
+    const [subE, descE, aiE, sentE] = await Promise.all([translate(subO), translate(descO), translate(aiO), translate(sentO)]);
+    G.dfEdited.push({
+      seller_id: r.seller_id||'', unify_id: r.unify_id||'',
+      use_case: r.use_case||'', created: r.created||'',
+      send_time: lv.send_time||'',
+      conversation_starter_subject_original: subO, conversation_starter_subject_translated: subE,
+      description_original: descO, description_translated: descE,
+      ai_message_original: aiO, ai_message_translated: aiE,
+      sent_message_original: sentO, sent_message_translated: sentE,
+    });
+    await sleep(300);
+  }
+  setProg(2,1); setStep(2,'done',`${total} rows translated`);
+}
+
+// ── Step 3: diffs + summaries ──
+async function runStep3() {
+  setStep(3,'active','Computing diffs…');
+  const total = G.dfEdited.length;
+  for (let i = 0; i < G.dfEdited.length; i++) {
+    const row = G.dfEdited[i];
+    setProg(3, i/total); setDetail(3, `${i+1} / ${total} rows enriched`);
+    const aiO = row.ai_message_original||'', sentO = row.sent_message_original||'';
+    row.change_summary = generateSummary(aiO, sentO);
+    row.ai_diff_html   = diffToHtml(charDiff(aiO, sentO).segsA, 'ai');
+    row.sent_diff_html = diffToHtml(charDiff(aiO, sentO).segsB, 'sent');
+    if (i % 10 === 0) await sleep(0);
+  }
+  setProg(3,1); setStep(3,'done',`${total} rows enriched`);
+}
+
+// ── Step 4: KPIs ──
+async function runStep4() {
+  setStep(4,'active','Computing…');
+  G.kpiResults = computeKPIs(G.dfEdited, G.dfFull);
+  setProg(4,1); setStep(4,'done','Done');
+  await sleep(250);
+}
+
+// ══════════════════════════════════════════════════════════════════════
+// TRANSLATE
+// ══════════════════════════════════════════════════════════════════════
+async function translate(text) {
+  if (!text || typeof text !== 'string') return text;
+  if ([...text].filter(c => c >= '一' && c <= '鿿').length < 2) return text;
+  const q = encodeURIComponent(text.slice(0,4900));
+  const url = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=zh-CN&tl=en&dt=t&q=${q}`;
+  try {
+    const r = await fetch(url); const d = await r.json();
+    return d[0].map(s=>s[0]).join('');
+  } catch {
+    await sleep(2000);
+    try { const r = await fetch(url); const d = await r.json(); return d[0].map(s=>s[0]).join(''); }
+    catch { return text; }
+  }
+}
+
+// ══════════════════════════════════════════════════════════════════════
+// DIFF
+// ══════════════════════════════════════════════════════════════════════
+function charDiff(a, b) {
+  const ops = editOps(a, b), segsA = [], segsB = [];
+  for (const [t,v] of ops) {
+    if (t==='eq')  { segsA.push(['eq',v]);  segsB.push(['eq',v]); }
+    if (t==='del') { segsA.push(['del',v]); }
+    if (t==='ins') { segsB.push(['ins',v]); }
+  }
+  return { segsA, segsB };
+}
+
+function editOps(a, b) {
+  const aw = [...a], bw = [...b], n = aw.length, m = bw.length;
+  const dp = Array.from({length:n+1}, (_,i) => { const r=new Array(m+1).fill(0); r[0]=i; return r; });
+  for (let j=0;j<=m;j++) dp[0][j]=j;
+  for (let i=1;i<=n;i++) for (let j=1;j<=m;j++)
+    dp[i][j] = aw[i-1]===bw[j-1] ? dp[i-1][j-1] : 1+Math.min(dp[i-1][j], dp[i][j-1], dp[i-1][j-1]);
+  const ops=[]; let i=n, j=m;
+  while (i>0||j>0) {
+    if (i>0&&j>0&&aw[i-1]===bw[j-1]) { ops.unshift(['eq',aw[i-1]]); i--;j--; }
+    else if (j>0&&(i===0||dp[i][j-1]<=dp[i-1][j])) { ops.unshift(['ins',bw[j-1]]); j--; }
+    else { ops.unshift(['del',aw[i-1]]); i--; }
+  }
+  const merged=[];
+  for (const op of ops) {
+    if (merged.length && merged[merged.length-1][0]===op[0]) merged[merged.length-1][1]+=op[1];
+    else merged.push([op[0],op[1]]);
+  }
+  return merged;
+}
+
+function diffToHtml(segs, mode) {
+  return segs.map(([t,v]) => {
+    const e = v.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>');
+    if (mode==='ai'   && t==='del') return `<span class="diff-del">${e}</span>`;
+    if (mode==='sent' && t==='ins') return `<span class="diff-ins">${e}</span>`;
+    return e;
+  }).join('');
+}
+
+// ══════════════════════════════════════════════════════════════════════
+// CHANGE SUMMARY
+// ══════════════════════════════════════════════════════════════════════
+function generateSummary(aiOrig, sentOrig) {
+  const aiChars = [...aiOrig].length, sentChars = [...sentOrig].length;
+  const ops = editOps(aiOrig, sentOrig);
+  const removed = ops.filter(o=>o[0]==='del').map(o=>o[1]).join('');
+  const added   = ops.filter(o=>o[0]==='ins').map(o=>o[1]).join('');
+
+  // Length — Chinese character count, 25% threshold
+  const d = sentChars - aiChars, p = aiChars ? Math.round(d/aiChars*100) : 0;
+  let ln;
+  if      (p<=-25) ln=`Significantly shortened (${Math.abs(p)}% fewer characters)`;
+  else if (p<=-10) ln=`Shortened (${Math.abs(p)}% fewer characters)`;
+  else if (p>=25)  ln=`Significantly expanded (${p}% more characters)`;
+  else if (p>=10)  ln=`Expanded (${p}% more characters)`;
+  else             ln=`Similar length (${d>=0?'+':''}${d} characters)`;
+
+  // Location — based on AI message character length, opening = first 30%
+  const nCh = aiChars || 1;
+  const zones={opening:0,middle:0,closing:0}; let pos=0;
+  for (const [t,v] of ops) {
+    if (t!=='eq') zones[pos/nCh<0.3?'opening':pos/nCh>0.7?'closing':'middle']++;
+    if (t!=='ins') pos += [...v].length;
+  }
+  const zc=Object.values(zones).filter(v=>v>0).length;
+  const zn = zc===0?'whole message rewritten':zc===3?'changes throughout entire message':
+    zc===2?'changes in '+Object.entries(zones).filter(([,v])=>v>0).map(([k])=>k).join(' & '):
+    'main change in '+Object.entries(zones).sort((a,b)=>b[1]-a[1])[0][0];
+
+  // Excerpts in Chinese
+  const rp = removed.trim().slice(0,150);
+  const ap = added.trim().slice(0,150);
+  const parts=[ln,`Location: ${zn}`];
+  if(rp) parts.push(`Removed: "${rp}"`);
+  if(ap) parts.push(`Added: "${ap}"`);
+  return parts.join('\n');
+}
+
+// ══════════════════════════════════════════════════════════════════════
+// KPI COMPUTATION
+// ══════════════════════════════════════════════════════════════════════
+function computeKPIs(dfEdited, dfFull) {
+  const saTotal={}, saEdited={}, saTuc={}, saEuc={}, totalUC={}, editedUC={};
+  for (const r of dfFull) {
+    const uc=r.use_case||'', sid=r.seller_id||'';
+    totalUC[uc]=(totalUC[uc]||0)+1; saTotal[sid]=(saTotal[sid]||0)+1;
+    saTuc[`${sid}|${uc}`]=(saTuc[`${sid}|${uc}`]||0)+1;
+    if (r.copy_to_chat_history) {
+      try { const d=JSON.parse(r.copy_to_chat_history), lv=d[d.latest_version||'v1']||{};
+        if (lv.is_change) { editedUC[uc]=(editedUC[uc]||0)+1; saEdited[sid]=(saEdited[sid]||0)+1; saEuc[`${sid}|${uc}`]=(saEuc[`${sid}|${uc}`]||0)+1; }
+      } catch {}
+    }
+  }
+  const totalAll=Object.values(totalUC).reduce((a,b)=>a+b,0);
+  const editAll =Object.values(editedUC).reduce((a,b)=>a+b,0);
+
+  const USE_CASES=['ai360_action_plan_emotional_bonding','ai360_action_plan_task','ai360_action_plan_product_storytelling'];
+  const UC_LBL={'ai360_action_plan_emotional_bonding':'Emotional Bonding','ai360_action_plan_task':'Task','ai360_action_plan_product_storytelling':'Product Storytelling'};
+
+  const metrics = dfEdited.map(classifyRow);
+  dfEdited.forEach((row, i) => { row._m = metrics[i]; });
+  const overall = aggM(metrics);
+  const byUC = {};
+  for (const uc of USE_CASES) byUC[UC_LBL[uc]] = aggM(metrics.filter(m=>m.use_case===uc));
+
+  function erFields(uc) {
+    const t=uc?(totalUC[uc]||0):totalAll, e=uc?(editedUC[uc]||0):editAll;
+    return { total_generated:t, total_edited:e, edit_rate:`${t?(e/t*100).toFixed(1):0}%  (${e} / ${t})` };
+  }
+  Object.assign(overall, erFields(null));
+  for (const uc of USE_CASES) Object.assign(byUC[UC_LBL[uc]], erFields(uc));
+
+  const allCounts=Object.values(saTotal), medThr=Math.round(mdn(allCounts));
+  function saDist(uc, minM) {
+    const rates=[];
+    for (const sid of Object.keys(saTotal)) {
+      const t=uc?(saTuc[`${sid}|${uc}`]||0):saTotal[sid], e=uc?(saEuc[`${sid}|${uc}`]||0):(saEdited[sid]||0);
+      if (t>=Math.max(minM||0,1)) rates.push(e/t*100);
+    }
+    const n=rates.length; if (!n) return {};
+    const mn=(rates.reduce((a,b)=>a+b,0)/n).toFixed(1), med=mdn(rates).toFixed(1);
+    const b0=rates.filter(r=>r===0).length, b1=rates.filter(r=>r>0&&r<=20).length,
+          b2=rates.filter(r=>r>20&&r<=75).length, b3=rates.filter(r=>r>75).length;
+    return { sa_count:n, mean_sa_rate:`${mn}%`, median_sa_rate:`${med}%`,
+      bucket_0:`${(b0/n*100).toFixed(1)}%  (${b0} SAs)`, bucket_1_20:`${(b1/n*100).toFixed(1)}%  (${b1} SAs)`,
+      bucket_20_75:`${(b2/n*100).toFixed(1)}%  (${b2} SAs)`, bucket_75plus:`${(b3/n*100).toFixed(1)}%  (${b3} SAs)` };
+  }
+  Object.assign(overall, saDist(null,0));
+  for (const uc of USE_CASES) Object.assign(byUC[UC_LBL[uc]], saDist(uc,0));
+  for (const [k,v] of Object.entries(saDist(null,medThr))) overall[`f_${k}`]=v;
+  for (const uc of USE_CASES) for (const [k,v] of Object.entries(saDist(uc,medThr))) byUC[UC_LBL[uc]][`f_${k}`]=v;
+
+  const cs=allCounts.slice().sort((a,b)=>b-a), nSA=cs.length, totM=cs.reduce((a,b)=>a+b,0);
+  const lv=cs.filter(x=>x<=5).length, top5=cs.slice(0,5).reduce((a,b)=>a+b,0);
+  const meanM=(totM/nSA).toFixed(1), medM=mdn(cs).toFixed(1);
+  Object.assign(overall, {
+    vol_low_volume:`${(lv/nSA*100).toFixed(1)}%  (${lv} of ${nSA} SAs)`,
+    vol_top5:`Top 5 SAs → ${totM?(top5/totM*100).toFixed(1):0}% of all messages`,
+    vol_mean:String(meanM), vol_median:String(medM),
+    vol_ratio:`Mean is ${(meanM/medM).toFixed(1)}x the median`
+  });
+
+  const saTable=Object.keys(saTotal).map(sid=>({ seller_id:sid, total_msgs:saTotal[sid], edited_msgs:saEdited[sid]||0,
+    edit_rate_pct:saTotal[sid]?((saEdited[sid]||0)/saTotal[sid]*100).toFixed(1)+'%':'0%' })).sort((a,b)=>b.total_msgs-a.total_msgs);
+
+  return { overall, 'Emotional Bonding':byUC['Emotional Bonding']||{}, 'Task':byUC['Task']||{},
+    'Product Storytelling':byUC['Product Storytelling']||{}, sections:buildSections(medThr), medianThreshold:medThr, saTable };
+}
+
+function classifyRow(row) {
+  const aiO=row.ai_message_original||'', sentO=row.sent_message_original||'';
+  const aiE=row.ai_message_translated||'', sentE=row.sent_message_translated||'';
+
+  // Length — Chinese character count, 25% threshold
+  const p=aiO.length?(sentO.length-aiO.length)/aiO.length*100:0;
+  const len=p<=-25?'Shortened':p>=25?'Expanded':Math.abs(p)>=10?'Moderate':'Minor';
+
+  // Chinese diff for content + location
+  const opsO=editOps(aiO,sentO);
+  const addO=opsO.filter(o=>o[0]==='ins').map(o=>o[1]).join('');
+  const remO=opsO.filter(o=>o[0]==='del').map(o=>o[1]).join('');
+  const all=addO+remO;
+
+  // Location — computed from Chinese diff, denominator = aiO.length, opening = first 30%
+  const nCh=aiO.length||1;
+  const zones={opening:0,middle:0,closing:0};
+  let pos=0;
+  for (const [t,v] of opsO) {
+    if (t!=='eq') {
+      const rel=pos/nCh;
+      zones[rel<0.3?'opening':rel>0.7?'closing':'middle']++;
+    }
+    if (t!=='ins') pos+=v.length; // advance by AI message chars only (eq + del)
+  }
+  const iO=zones.opening>0, iM=zones.middle>0, iC=zones.closing>0;
+
+  // Emoji — check English diff (emoji survive translation)
+  const opsE=editOps(aiE,sentE);
+  const addE=opsE.filter(o=>o[0]==='ins').map(o=>o[1]).join('');
+  const remE=opsE.filter(o=>o[0]==='del').map(o=>o[1]).join('');
+  const ER=/[\u{1F600}-\u{1F64F}\u{1F300}-\u{1F5FF}\u{1F680}-\u{1F6FF}\u{2600}-\u{27BF}]/u;
+
+  // Full keyword lists — Chinese, from real data analysis
+  const CN_G =['亲爱','您好','你好','小姐','姐姐','女士','好久不见','先生','太太','早上好','下午好','晚上好','嗨','哈喽','久违'];
+  const CN_C =['有空','看看','联系','随时','过来','试试','试戴','带来','方便','来店','到店','欢迎','预约','安排','拜访','有机会','欢迎光临'];
+  const CN_P =['珠宝','卡地亚','系列','腕表','戒指','LOVE','Love','猎豹','玫瑰','钻石','Juste','Clou','手镯','项链','手表','吊坠','耳环','胸针','蓝气球','三环','Trinity','钉子','Santos','Tank','Clash','宝石','项圈'];
+  const CN_S =['入手','购买','现在','库存','现货','稀缺','有限','紧张','难得','最后'];
+  const CN_CA=['清洗','服务','清洁','保养','免费','护理','每年','维修','抛光','售后','养护','定期'];
+  const CN_SE=['下午','下个月','去年','上次','春','夏','秋','冬','节日','新年','圣诞','礼物','礼品','情人节','母亲节','七夕','节庆','假期','生日','周年'];
+
+  return { use_case:row.use_case, length:len, in_opening:iO, in_middle:iM, in_closing:iC,
+    emoji_added:ER.test(addE)||ER.test(addO), emoji_removed:ER.test(remE),
+    greeting_mod:CN_G.some(w=>all.includes(w)), cta_modified:CN_C.some(w=>all.includes(w)),
+    product_modified:CN_P.some(w=>all.includes(w)), scarcity:CN_S.some(w=>all.includes(w)),
+    aftersales:CN_CA.some(w=>all.includes(w)), seasonal:CN_SE.some(w=>all.includes(w)),
+    ai_chars:aiO.length, sent_chars:sentO.length };
+}
+
+function aggM(sub) {
+  const n=sub.length; if(!n) return {n:0};
+  const pct=f=>(sub.filter(m=>m[f]).length/n*100).toFixed(1)+'%';
+  const pctB=(...bs)=>(sub.filter(m=>bs.includes(m.length)).length/n*100).toFixed(1)+'%';
+  const avg=(k,b)=>{ const v=sub.filter(m=>b?m.length===b:true).map(m=>m[k]).filter(Number.isFinite); return v.length?Math.round(v.reduce((a,b)=>a+b,0)/v.length):'—'; };
+  return { n, pct_shortened:pctB('Shortened'), pct_expanded:pctB('Expanded'), pct_no_change:pctB('Minor'),
+    avg_ai_chars:avg('ai_chars'), avg_sent_chars:avg('sent_chars'),
+    avg_ai_chars_shortened:avg('ai_chars','Shortened'), avg_sent_chars_shortened:avg('sent_chars','Shortened'),
+    avg_ai_chars_expanded:avg('ai_chars','Expanded'),  avg_sent_chars_expanded:avg('sent_chars','Expanded'),
+    pct_opening:pct('in_opening'), pct_middle:pct('in_middle'), pct_closing:pct('in_closing'),
+    pct_emoji_added:pct('emoji_added'), pct_emoji_removed:pct('emoji_removed'),
+    pct_cta:pct('cta_modified'), pct_greeting:pct('greeting_mod'), pct_product_modified:pct('product_modified'),
+    pct_scarcity:pct('scarcity'), pct_aftersales:pct('aftersales'), pct_seasonal:pct('seasonal') };
+}
+
+function buildSections(thr) {
+  return [
+    ['Edit Rate',[['Total AI-generated messages','total_generated'],['Total SA-edited messages','total_edited'],['Edit rate  (edited / total generated)','edit_rate']]],
+    ['Location of Change',[['% with edits in opening section','pct_opening'],['% with edits in middle section','pct_middle'],['% with edits in closing section','pct_closing']]],
+    ['Length Change  (Chinese character count)',[['% Shortened  (> 25% fewer characters)','pct_shortened'],['Avg characters — AI message (shortened rows)','avg_ai_chars_shortened'],['Avg characters — Sent message (shortened rows)','avg_sent_chars_shortened'],['% Expanded   (> 25% more characters)','pct_expanded'],['Avg characters — AI message (expanded rows)','avg_ai_chars_expanded'],['Avg characters — Sent message (expanded rows)','avg_sent_chars_expanded'],['% No significant change  (< 10%)','pct_no_change'],['Avg characters — AI message (all)','avg_ai_chars'],['Avg characters — Sent message (all)','avg_sent_chars']]],
+    ['Content Type',[['% modified greeting / salutation','pct_greeting'],['% modified call-to-action','pct_cta'],['% modified product references','pct_product_modified'],['% added emoji','pct_emoji_added'],['% removed emoji from AI','pct_emoji_removed']]],
+    ['SA Distribution',[['Total SAs with AI-generated messages','sa_count'],['% of SAs who never edited  (0%)','bucket_0'],['% of SAs with low edit rate  (1–20%)','bucket_1_20'],['% of SAs with moderate edit rate  (20–75%)','bucket_20_75'],['% of SAs with high edit rate  (> 75%)','bucket_75plus'],['Mean edit rate per SA','mean_sa_rate'],['Median edit rate per SA','median_sa_rate']]],
+  ];
+}
+
+// ══════════════════════════════════════════════════════════════════════
+// EVIDENCE
+// ══════════════════════════════════════════════════════════════════════
+const SA_DIST_KEYS=new Set(['sa_count','mean_sa_rate','median_sa_rate','bucket_0','bucket_1_20','bucket_20_75','bucket_75plus','vol_low_volume','vol_top5','vol_mean','vol_median','vol_ratio']);
+const NO_EV_KEYS=new Set(['avg_ai_chars','avg_sent_chars','avg_ai_chars_shortened','avg_sent_chars_shortened','avg_ai_chars_expanded','avg_sent_chars_expanded','total_generated','total_edited','edit_rate']);
+const UC_RAW={'Emotional Bonding':'ai360_action_plan_emotional_bonding','Task':'ai360_action_plan_task','Product Storytelling':'ai360_action_plan_product_storytelling'};
+
+function getEvRows(key, useCase) {
+  if (SA_DIST_KEYS.has(key)||NO_EV_KEYS.has(key)) return null;
+  let df=G.dfEdited;
+  if (useCase && UC_RAW[useCase]) df=df.filter(r=>r.use_case===UC_RAW[useCase]);
+  const m=r=>r._m||{};
+  const FILTERS={
+    total_edited:     ()=>df,
+    edit_rate:        ()=>df,
+    n:                ()=>df,
+    pct_shortened:    ()=>df.filter(r=>m(r).length==='Shortened'),
+    pct_expanded:     ()=>df.filter(r=>m(r).length==='Expanded'),
+    pct_no_change:    ()=>df.filter(r=>m(r).length==='Minor'),
+    pct_opening:      ()=>df.filter(r=>m(r).in_opening),
+    pct_middle:       ()=>df.filter(r=>m(r).in_middle),
+    pct_closing:      ()=>df.filter(r=>m(r).in_closing),
+    pct_greeting:     ()=>df.filter(r=>m(r).greeting_mod),
+    pct_cta:          ()=>df.filter(r=>m(r).cta_modified),
+    pct_product_modified:()=>df.filter(r=>m(r).product_modified),
+    pct_scarcity:     ()=>df.filter(r=>m(r).scarcity),
+    pct_aftersales:   ()=>df.filter(r=>m(r).aftersales),
+    pct_seasonal:     ()=>df.filter(r=>m(r).seasonal),
+    pct_emoji_added:  ()=>df.filter(r=>m(r).emoji_added),
+    pct_emoji_removed:()=>df.filter(r=>m(r).emoji_removed),
+  };
+  return FILTERS[key] ? FILTERS[key]() : null;
+}
+
+// ══════════════════════════════════════════════════════════════════════
+// DASHBOARD RENDER
+// ══════════════════════════════════════════════════════════════════════
+function renderDashboard(monthKey) {
+  document.getElementById('dash-month-tag').textContent = monthKey;
+  const ov=G.kpiResults.overall;
+  const rate=(ov.edit_rate||'—').split('%')[0]+'%';
+  document.getElementById('banner').innerHTML=`
+    <div class="banner-stat"><div class="bval">${(ov.total_generated||0).toLocaleString()}</div><div class="blbl">AI Messages Generated</div></div>
+    <div class="banner-stat"><div class="bval">${(ov.total_edited||0).toLocaleString()}</div><div class="blbl">Messages Edited</div></div>
+    <div class="banner-stat"><div class="bval">${rate}</div><div class="blbl">Overall Edit Rate</div></div>
+    <div class="banner-stat"><div class="bval">${ov.sa_count||'—'}</div><div class="blbl">Sales Associates</div></div>`;
+  const tabs=['Overall','Emotional Bonding','Task','Product Storytelling'];
+  document.getElementById('tab-sidebar').innerHTML=tabs.map(t=>
+    `<button class="tab-btn ${t===G.activeTab?'active':''}" onclick="switchTab('${t}')">${t}</button>`).join('');
+  renderKpiPanel();
+}
+
+function switchTab(tab) {
+  G.activeTab=tab;
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.toggle('active',b.textContent===tab));
+  renderKpiPanel();
+}
+
+function renderKpiPanel() {
+  const kr=G.kpiResults, tab=G.activeTab;
+  const agg=tab==='Overall'?kr.overall:(kr[tab]||{});
+  let html='';
+  for (const [sLbl, items] of kr.sections) {
+    html+=`<div class="section-hdr">${sLbl}</div>`;
+    for (const [label, key] of items) {
+      const val=agg[key]!==undefined?agg[key]:'—';
+      const eid=`ev-${key}-${tab.replace(/\s/g,'_')}`;
+      let btn='';
+      if (SA_DIST_KEYS.has(key)) {
+        btn=`<button class="proof-btn" onclick="toggleEv('${eid}','${key}','${tab}','sa')">Show evidence</button>`;
+      } else if (!NO_EV_KEYS.has(key)) {
+        const rows=getEvRows(key, tab==='Overall'?null:tab);
+        if (rows&&rows.length) btn=`<button class="proof-btn" onclick="toggleEv('${eid}','${key}','${tab}','msg')">Show evidence (${rows.length})</button>`;
+        else btn=`<span class="no-ev">—</span>`;
+      } else btn=`<span class="no-ev">—</span>`;
+      html+=`<div class="kpi-row"><div class="kpi-label">${label}</div><div class="kpi-right"><div class="kpi-value">${val}</div>${btn}</div><div class="ev-drawer" id="${eid}"></div></div>`;
+    }
+  }
+  document.getElementById('kpi-panel').innerHTML=html;
+}
+
+function toggleEv(eid, key, tab, type) {
+  const d=document.getElementById(eid);
+  if (d.classList.toggle('open') && !d.innerHTML.trim()) {
+    const uc=tab==='Overall'?null:tab;
+    if (type==='sa') {
+      let rows=G.kpiResults.saTable;
+      if (uc&&UC_RAW[uc]) { const sids=new Set(G.dfEdited.filter(r=>r.use_case===UC_RAW[uc]).map(r=>r.seller_id)); rows=rows.filter(r=>sids.has(r.seller_id)); }
+      // Filter to only the SAs in the specific bucket
+      const rv=r=>parseFloat(r.edit_rate_pct);
+      const bucketFilter={
+        bucket_0:      r=>rv(r)===0,
+        bucket_1_20:   r=>rv(r)>0&&rv(r)<=20,
+        bucket_20_75:  r=>rv(r)>20&&rv(r)<=75,
+        bucket_75plus: r=>rv(r)>75,
+      };
+      if (bucketFilter[key]) rows=rows.filter(bucketFilter[key]);
+      d.innerHTML=`<h4>SA-level evidence (${rows.length} sales associates)</h4>`+mkTable(['seller_id','total_msgs','edited_msgs','edit_rate_pct'],rows,false);
+    } else {
+      const rows=getEvRows(key,uc)||[];
+      if (!rows.length) { d.innerHTML='<h4>No matching rows</h4>'; return; }
+      d.innerHTML=`<h4>${rows.length} rows that contribute to this KPI</h4>`+mkTable(['seller_id','use_case','ai_message_original','sent_message_original','change_summary'],rows,true);
+    }
+  }
+}
+
+const COL_LBL={seller_id:'Seller ID',use_case:'Use Case',ai_message_original:'AI Message (Original)',sent_message_original:'SA Sent (Original)',change_summary:'Change Summary',total_msgs:'Total Msgs',edited_msgs:'Edited',edit_rate_pct:'Edit Rate'};
+function mkTable(cols, rows, diff) {
+  const hdrs=cols.map(c=>`<th>${COL_LBL[c]||c}</th>`).join('');
+  const trs=rows.map(r=>{
+    const tds=cols.map(c=>{
+      let v=r[c]!==undefined?r[c]:'';
+      if(diff&&c==='ai_message_original')   v=r.ai_diff_html||v;
+      if(diff&&c==='sent_message_original') v=r.sent_diff_html||v;
+      return `<td>${String(v).replace(/\n/g,'<br>')}</td>`;
+    }).join('');
+    return `<tr>${tds}</tr>`;
+  }).join('');
+  return `<div class="ev-wrap"><table class="ev-table"><thead><tr>${hdrs}</tr></thead><tbody>${trs}</tbody></table></div>`;
+}
+
+// ══════════════════════════════════════════════════════════════════════
+// DOWNLOADS
+// ══════════════════════════════════════════════════════════════════════
+function downloadTranslated() {
+  const cols=['seller_id','unify_id','use_case','created','send_time',
+    'conversation_starter_subject_original','conversation_starter_subject_translated',
+    'description_original','description_translated',
+    'ai_message_original','ai_message_translated',
+    'sent_message_original','sent_message_translated'];
+  const data=G.dfEdited.map(r=>{ const o={}; cols.forEach(c=>o[c]=r[c]||''); return o; });
+  const ws=XLSX.utils.json_to_sheet(data,{header:cols});
+  const wb=XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb,ws,'SA Edits Translated');
+  XLSX.writeFile(wb,`SA_edits_translated_${G.activeMonth.replace(/ /g,'_')}.xlsx`);
+}
+
+function downloadColoured() {
+  const cols=['seller_id','use_case','created','send_time','ai_message_original','ai_message_translated','sent_message_original','sent_message_translated','change_summary'];
+  const data=G.dfEdited.map(r=>{ const o={}; cols.forEach(c=>o[c]=r[c]||''); return o; });
+  const ws=XLSX.utils.json_to_sheet(data,{header:cols});
+  const wb=XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb,ws,'SA Edits');
+  XLSX.writeFile(wb,`SA_edits_coloured_${G.activeMonth.replace(/ /g,'_')}.xlsx`);
+}
+
+function downloadKPI() {
+  const kr=G.kpiResults, tabs=['Overall','Emotional Bonding','Task','Product Storytelling'];
+  const rows=[['KPI Metric',...tabs]];
+  for (const [,items] of kr.sections)
+    for (const [label,key] of items)
+      rows.push([label,...tabs.map(t=>{ const a=t==='Overall'?kr.overall:(kr[t]||{}); return a[key]!==undefined?a[key]:'—'; })]);
+  const ws=XLSX.utils.aoa_to_sheet(rows); const wb=XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb,ws,'KPI Summary');
+  XLSX.writeFile(wb,`KPI_Summary_${G.activeMonth.replace(/ /g,'_')}.xlsx`);
+}
+
+// ══════════════════════════════════════════════════════════════════════
+// UTILS
+// ══════════════════════════════════════════════════════════════════════
+function setStep(n,st,txt) { const e=document.getElementById(`s${n}-status`); if(e){ e.textContent=txt; e.className=`step-status ${st}`; } }
+function setProg(n,f)  { const b=document.getElementById(`s${n}-bar`); if(b){ b.style.width=(Math.min(f,1)*100)+'%'; if(f>=1) b.classList.add('done'); } }
+function setDetail(n,t){ const e=document.getElementById(`s${n}-detail`); if(e) e.textContent=t; }
+function sleep(ms) { return new Promise(r=>setTimeout(r,ms)); }
+function mdn(arr) { if(!arr.length) return 0; const s=[...arr].sort((a,b)=>a-b), m=Math.floor(s.length/2); return s.length%2?s[m]:(s[m-1]+s[m])/2; }
+
+// init
+renderHomepage();
+</script>
+</body>
+</html>
