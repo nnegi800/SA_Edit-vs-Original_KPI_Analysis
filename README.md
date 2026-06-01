@@ -75,7 +75,8 @@ Click the **AI360 SA Edits KPI** title at the top of any page to return to the h
 
 At the bottom of the dashboard:
 
-- **SA_edits_coloured.xlsx** — the filtered edited rows with original and translated message columns
+- **SA_edits_translated.xlsx** — the filtered edited rows with both original Chinese and English translated columns (subject, description, AI message, sent message)
+- **SA_edits_coloured.xlsx** — same rows with character-level diff highlighting (red = removed, green = added)
 - **KPI_Summary.xlsx** — the full KPI table exported as a spreadsheet
 
 ---
@@ -164,12 +165,3 @@ All thresholds are defined at the top of `add_kpi_panel.py`:
 - **Content type keywords** — `CN_GREET`, `CN_CTA`, `CN_PRODUCT`, `CN_SCARCITY`, `CN_CARE`, `CN_SEASON` lists in `classify()`
 - **Location zones** — `0.3` and `0.7` thresholds in `classify()` (30% / 70% of character length)
 
-### Streamlit UI (alternative to the HTML tool)
-
-An alternative browser interface built with Streamlit is also included:
-
-```bash
-streamlit run app.py
-```
-
-This runs the same pipeline interactively in the browser with a Python backend, as an alternative to the standalone `index.html` tool.
