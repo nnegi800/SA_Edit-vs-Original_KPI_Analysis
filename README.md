@@ -88,6 +88,15 @@ At the bottom of the dashboard:
 | `index.html` | The entire tool — open this in a browser |
 | `KPI_REFERENCE.md` | Full KPI definitions and thresholds |
 
+---
+
+## Demo
+
+A full walkthrough of the tool is available here:
+[▶ Watch Loom demo](https://www.loom.com/share/75651eae16c9462b9fe4a243be0eea85)
+
+---
+
 ## Notes
 
 - All data stays in your browser (`localStorage`). Nothing is uploaded to any server.
