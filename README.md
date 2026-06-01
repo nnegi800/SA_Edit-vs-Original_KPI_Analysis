@@ -61,7 +61,7 @@ KPI sections are listed in order:
 
 Click **Show evidence** next to any KPI row to expand a table of the individual rows or SAs that contributed to that number. Removed text is shown in red, added text in green.
 
-> For the exact thresholds and definitions behind each KPI, see [KPI_REFERENCE.md](KPI_REFERENCE.md).
+> For the exact thresholds and definitions behind each KPI, see [KPI_REFERENCE.md](documentation/KPI_REFERENCE.md).
 
 ---
 
@@ -144,10 +144,10 @@ For users who want to run the analysis locally and export results to Excel rathe
 ### Setup
 
 ```bash
-pip install -r requirements.txt
+pip install -r python_pipeline/requirements.txt
 ```
 
-### Scripts — run in this order
+### Scripts — run in this order from the `python_pipeline/` folder
 
 | Step | Script | What it does |
 |---|---|---|
@@ -158,7 +158,7 @@ pip install -r requirements.txt
 
 ### Adjusting thresholds
 
-All thresholds are defined at the top of `add_kpi_panel.py`:
+All thresholds are defined in `python_pipeline/add_kpi_panel.py`:
 
 - **Length change threshold** — search for `25` in the `classify()` function (`>= 25` = Expanded, `<= -25` = Shortened)
 - **SA distribution buckets** — search for `bucket_0`, `bucket_1_20` etc. in `_sa_distribution_kpis()`
