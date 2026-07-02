@@ -2,7 +2,7 @@
 
 ![AI360 SA Edits KPI dashboard](preview.png)
 
-A browser-based dashboard that measures how Sales Associates edit AI-generated outreach messages in the AI360 system. No install, no server — open `index.html` and everything runs locally in your browser.
+A browser-based dashboard that measures how Sales Associates edit AI-generated outreach messages in the AI360 system. No install, no server — open `ui/index.html` and everything runs locally in your browser.
 
 **[▶ Watch the demo](https://www.loom.com/share/75651eae16c9462b9fe4a243be0eea85)**
 
@@ -10,7 +10,7 @@ A browser-based dashboard that measures how Sales Associates edit AI-generated o
 
 ## Run an analysis
 
-1. Open `index.html` in Chrome or Edge
+1. Open `ui/index.html` in Chrome or Edge
 2. Click **+ New Analysis**, drop in your raw `.xlsx` export, and pick the month
 3. Click **Run Analysis** — the tool filters, translates, diffs, and computes KPIs, then opens the dashboard
 
@@ -28,7 +28,7 @@ Four tabs (Overall, Emotional Bonding, Task, Product Storytelling), a headline b
 4. **Content Type** — greeting, CTA, product refs, emoji, etc.
 5. **SA Distribution** — how edit rates spread across individual SAs
 
-Click **Show evidence** on any row to see the underlying messages, with removed text in red and added text in green. Exact thresholds are in [KPI_REFERENCE.md](documentation/KPI_REFERENCE.md).
+Click **Show evidence** on any row to see the underlying messages, with removed text in red and added text in green. Exact thresholds are in [KPI_REFERENCE.md](docs/KPI_REFERENCE.md).
 
 **Downloads:** translated rows, colour-diffed rows, and the full `KPI_Summary.xlsx`.
 
