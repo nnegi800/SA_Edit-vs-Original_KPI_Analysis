@@ -1,6 +1,6 @@
 # SA Edit vs Original — KPI Analysis
 
-![AI360 SA Edits KPI dashboard](preview.png)
+![AI360 SA Edits KPI dashboard](docs/preview.png)
 
 A browser-based dashboard that measures how Sales Associates edit AI-generated outreach messages in the AI360 system. No install, no server — open `ui/index.html` and everything runs locally in your browser.
 
