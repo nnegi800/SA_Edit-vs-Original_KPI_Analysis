@@ -1,8 +1,8 @@
-# SA Edit vs Original — KPI Analysis
+# SA Edit vs Original - KPI Analysis
 
 ![AI360 SA Edits KPI dashboard](docs/preview.png)
 
-A browser-based dashboard that measures how Sales Associates edit AI-generated outreach messages in the AI360 system. No install, no server — open `ui/index.html` and everything runs locally in your browser.
+A browser-based dashboard that measures how Sales Associates edit AI-generated outreach messages in the AI360 system. No install, no server - open `ui/index.html` and everything runs locally in your browser.
 
 **[▶ Watch the demo](https://www.loom.com/share/75651eae16c9462b9fe4a243be0eea85)**
 
@@ -12,7 +12,7 @@ A browser-based dashboard that measures how Sales Associates edit AI-generated o
 
 1. Open `ui/index.html` in Chrome or Edge
 2. Click **+ New Analysis**, drop in your raw `.xlsx` export, and pick the month
-3. Click **Run Analysis** — the tool filters, translates, diffs, and computes KPIs, then opens the dashboard
+3. Click **Run Analysis** - the tool filters, translates, diffs, and computes KPIs, then opens the dashboard
 
 The report is saved to your browser and appears on the home screen. Click any month to reload it instantly.
 
@@ -22,17 +22,17 @@ The report is saved to your browser and appears on the home screen. Click any mo
 
 Four tabs (Overall, Emotional Bonding, Task, Product Storytelling), a headline banner (messages generated, edited, edit rate, # of SAs), and five KPI sections:
 
-1. **Edit Rate** — share of AI messages the SAs edited
-2. **Location of Change** — opening / middle / closing
-3. **Length Change** — shortened vs expanded
-4. **Content Type** — greeting, CTA, product refs, emoji, etc.
-5. **SA Distribution** — how edit rates spread across individual SAs
+1. **Edit Rate** - share of AI messages the SAs edited
+2. **Location of Change** - opening / middle / closing
+3. **Length Change** - shortened vs expanded
+4. **Content Type** - greeting, CTA, product refs, emoji, etc.
+5. **SA Distribution** - how edit rates spread across individual SAs
 
 Click **Show evidence** on any row to see the underlying messages, with removed text in red and added text in green. Exact thresholds are in [KPI_REFERENCE.md](docs/KPI_REFERENCE.md).
 
 **Downloads:** translated rows, colour-diffed rows, and the full `KPI_Summary.xlsx`.
 
-> All data stays in your browser (`localStorage`). Nothing is uploaded — translation (Step 2) is the only step that touches the network.
+> All data stays in your browser (`localStorage`). Nothing is uploaded - translation (Step 2) is the only step that touches the network.
 
 ---
 
